@@ -1,0 +1,241 @@
+/* --- STYLE GLOBAL & VARIABLES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* --- EN-TÊTE & NAVIGATION RESPONSIVE --- */
+header {
+    background: #004aad;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+header h1 {
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+nav {
+    margin-top: 0.5rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    color: #ffc107;
+    text-decoration: underline;
+}
+
+/* --- SECTION HERO (ACCUEIL) --- */
+.hero {
+    background: linear-gradient(rgba(0,74,173,0.85), rgba(0,74,173,0.85)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+    color: white;
+    text-align: center;
+    padding: 3rem 1rem;
+    overflow: hidden;
+}
+
+.hero h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero .slogan {
+    font-style: italic;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #ffc107;
+}
+
+.hero p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn {
+    background: #ffc107;
+    color: #333;
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: 0.3s;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+}
+
+/* --- ANIMATIONS & DÉFILEMENTS DE TEXTE --- */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slide {
+    animation: slideInFromLeft 1.2s ease-out forwards;
+}
+
+.animate-fade-up {
+    animation: fadeInUp 1.2s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0; /* Caché avant l'animation */
+}
+
+.animate-fade-up-delayed {
+    animation: fadeInUp 1.2s ease-out forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+}
+
+/* --- CONTENEUR & CARTES --- */
+.container {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+
+.card h3 {
+    color: #004aad;
+    margin-bottom: 1.0rem;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #f4f7f6;
+    padding-bottom: 0.4rem;
+}
+
+/* Grille adaptative */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+    header h1 {
+        font-size: 1.4rem;
+    }
+    .hero {
+        padding: 4rem 2rem;
+    }
+    .hero h2 {
+        font-size: 2.2rem;
+    }
+    .card {
+        padding: 2.5rem;
+    }
+}
+
+/* --- ENCADRES SPECIFIQUES --- */
+.badge-free {
+    background: #e6f4ea;
+    border-left: 5px solid #34a853;
+    padding: 1.2rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+}
+
+.badge-free h4 {
+    color: #137333;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.tarifs-box {
+    background: #fff8e1;
+    border-left: 5px solid #ffc107;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+}
+
+.tarifs-box h4 {
+    color: #856404;
+    margin-bottom: 0.4rem;
+}
+
+/* --- FORMULAIRES --- */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #004aad;
+    font-size: 0.95rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* --- PIED DE PAGE --- */
+footer {
+    text-align: center;
+    padding: 1.2rem;
+    background: #222;
+    color: white;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+}

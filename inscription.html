@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Club du Savoir Plus</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>JEUNESSE & SAVOIR — Club du Savoir Plus</h1>
+        <nav>
+            <a href="index.html">Accueil</a>
+            <a href="Inscription.html" class="active">Inscription</a>
+            <a href="Contacter.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+        <div class="card">
+            <h3>📝 Formulaire de Préinscription (2 Semaines Gratuites)</h3>
+            <p style="margin-bottom: 1.5rem;">Remplissez ce formulaire pour valider votre participation aux deux semaines de cours gratuits et intégrer le groupe WhatsApp de votre catégorie.</p>
+            <p style="margin-bottom: 1.5rem;">Nous vous rassurons que votre confidentialité est garantie et que toutes les informations fournies seront utilisées exclusivement à des fins pédagogiques.</p>
+            <p style="margin-bottom: 1.5rem;">Après votre préinscription,vous serez amenés à nous écrire sur WhatsApp pour continuer votre accompagnement.</p>
+
+            <!-- Rappel des tarifs post-gratuité 
+            <div class="tarifs-box">
+                <h4>📌 Rappel de la tarification (après la phase gratuite de 2 semaines) :</h4>
+                <ul style="margin-left: 20px; font-size: 0.95rem;">
+                    <li>Classes de 3e & 1ère : <strong>3 000 FCFA / mois</strong></li>
+                    <li>Classe de Terminale (BAC technique) : <strong>5 000 FCFA / mois</strong></li>
+                    <li>Candidats Libres (CAP / DT / BAC technique) : <strong>8 000 FCFA / mois</strong></li>
+                </ul>
+            </div>  -->
+
+            <!-- Formulaire pointant vers ton endpoint Formspree -->
+            <form id="inscriptionForm" action="https://formspree.io/f/xppagrgq" method="POST">
+                <div class="form-group">
+                    <label for="nom">Nom et Prénoms :</label>
+                    <input type="text" id="nom" name="nom" required placeholder="Ex: Koffi Mensah">
+                </div>
+
+                <div class="form-group">
+                    <label for="telephone">Numéro de téléphone WhatsApp :</label>
+                    <input type="tel" id="telephone" name="telephone" required placeholder="Ex: +2290147928887">
+                    <small style="color: #666; font-size: 0.85rem;">Seuls les chiffres et le signe '+' sont acceptés.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="statut">Statut :</label>
+                    <select id="statut" name="statut" required>
+                        <option value="">-- Choisissez votre statut --</option>
+                        <option value="Élève régulier">Élève en classe régulière</option>
+                        <option value="Candidat libre">Candidat libre</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="classe">Classe / Examen préparé :</label>
+                    <select id="classe" name="classe" required>
+                        <option value="">-- Choisissez votre classe --</option>
+                        <option value="3e année (CAP)">3e année du 1er cycle (CAP)</option>
+                        <option value="1ère">1ère</option>
+                        <option value="Terminale (BAC/DT)">Terminale (BAC Technique/DT)</option>
+                        <option value="Candidat Libre - CAP">Candidat Libre - CAP</option>
+                        <option value="Candidat Libre - DT">Candidat Libre - DT</option>
+                        <option value="Candidat Libre - BAC">Candidat Libre - BAC</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="filiere">Filière :</label>
+                    <select id="filiere" name="filiere" required>
+                        <option value="">-- Choisissez votre filière --</option>
+                        <option value="F3: Électrotechnique">F3: Électrotechnique</option>
+                        <option value="F4: Génie Civil">F4: Génie Civil</option>
+                        <option value="Autre filière technique">Autre filière technique</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="etablissement">Établissement d'origine :</label>
+                    <input type="text" id="etablissement" name="etablissement" placeholder="Ex: Lycée Technique de Lokossa">
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; border: none; cursor: pointer; text-align: center;">Valider ma préinscription</button>
+            </form>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 - Jeunesse & Savoir / Club du Savoir Plus. Contact WhatsApp : +229 01 47 92 88 87 / 01 98 99 48 16</p>
+    </footer>
+
+    <!-- Script de validation, enregistrement Formspree et redirection WhatsApp -->
+    <script>
+        document.getElementById('inscriptionForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Empêche l'envoi classique pour tout contrôler
+
+            const telInput = document.getElementById('telephone').value.trim();
+            const phoneRegex = /^\+?[0-9\s]{8,15}$/;
+
+            // 1. Vérification stricte du téléphone
+            if (!phoneRegex.test(telInput)) {
+                alert("Erreur : Le numéro de téléphone WhatsApp ne doit contenir que des chiffres (et éventuellement le signe '+').");
+                return;
+            }
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // 2. Envoi des données en arrière-plan vers ton endpoint Formspree
+            try {
+                let response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    // Récupération des valeurs pour construire le message WhatsApp
+                    const nom = document.getElementById('nom').value;
+                    const telephone = document.getElementById('telephone').value;
+                    const statut = document.getElementById('statut').value;
+                    const classe = document.getElementById('classe').value;
+                    const filiere = document.getElementById('filiere').value;
+                    const etablissement = document.getElementById('etablissement').value || "Non renseigné";
+
+                    // 3. Construction du message WhatsApp
+                    const adminPhone = "2290147928887";
+                    const message = `Salut, je souhaite m'inscrire au Club du Savoir Plus.%0A%0A*Nom :* ${nom}%0A*Téléphone :* ${telephone}%0A*Statut :* ${statut}%0A*Classe :* ${classe}%0A*Filière :* ${filiere}%0A*Établissement :* ${etablissement}`;
+                    
+                    const whatsappURL = `https://wa.me/${adminPhone}?text=${message}`;
+
+                    alert("Préinscription enregistrée avec succès ! Redirection vers WhatsApp...");
+                    window.location.href = whatsappURL; // Redirige vers ton WhatsApp
+                } else {
+                    alert("Une erreur est survenue lors de l'enregistrement. Veuillez réessayer.");
+                }
+            } catch (error) {
+                alert("Erreur de connexion. Vérifiez votre connexion internet.");
+            }
+        });
+    </script>
+
+</body>
+</html>
