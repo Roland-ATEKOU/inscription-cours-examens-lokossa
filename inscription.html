@@ -45,9 +45,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="telephone">Numéro de téléphone WhatsApp :</label>
+                    <label for="telephone">Numéro de téléphone WhatsApp sans espace:</label>
                     <input type="tel" id="telephone" name="telephone" required placeholder="Ex: +2290147928887">
-                    <small style="color: #666; font-size: 0.85rem;">Seuls les chiffres et le signe '+' sont acceptés.</small>
+                    <small style="color: #666; font-size: 0.85rem;">Seuls les chiffres et le signe '+' sont acceptés et surtout sans espace.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="quartier">Quartier de résidence :</label>
+                    <input type="text" id="quartier" name="quartier" required placeholder="Ex: Agbokou, Centre-ville, Kpodji...">
                 </div>
 
                 <div class="form-group">
@@ -63,8 +68,8 @@
                     <label for="classe">Classe / Examen préparé :</label>
                     <select id="classe" name="classe" required>
                         <option value="">-- Choisissez votre classe --</option>
-                        <option value="3e année (CAP)">3e année du 1er cycle (CAP)</option>
-                        <option value="1ère">1ère</option>
+                        <option value="3e année (CAP)">3e année du 1er cycle (CAP/BEPC)</option>
+                        <option value="1ère">1ère (CAP)</option>
                         <option value="Terminale (BAC/DT)">Terminale (BAC Technique/DT)</option>
                         <option value="Candidat Libre - CAP">Candidat Libre - CAP</option>
                         <option value="Candidat Libre - DT">Candidat Libre - DT</option>
@@ -82,8 +87,13 @@
                     </select>
                 </div>
 
+                <div class="form-group" id="filiereAutreGroup" style="display: none;">
+                    <label for="filiere_autre">Précisez votre filière :</label>
+                    <input type="text" id="filiere_autre" name="filiere_autre" placeholder="Ex: F2 Comptabilité, MEI, F5...">
+                </div>
+
                 <div class="form-group">
-                    <label for="etablissement">Établissement d'origine :</label>
+                    <label for="etablissement">Actuelle Ecole de Formation :</label>
                     <input type="text" id="etablissement" name="etablissement" placeholder="Ex: Lycée Technique de Lokossa">
                 </div>
 
@@ -99,11 +109,26 @@
                 📲 Whattsapp Direct 
             </a>
         </p>
-        <!--+229 01 47 92 88 87 / 01 98 99 48 16-->
     </footer>
 
     <!-- Script de validation, enregistrement Formspree et redirection WhatsApp -->
     <script>
+        const filiereSelect = document.getElementById('filiere');
+        const filiereAutreGroup = document.getElementById('filiereAutreGroup');
+        const filiereAutreInput = document.getElementById('filiere_autre');
+
+        // Affiche/masque le champ "Précisez votre filière" selon le choix du select
+        filiereSelect.addEventListener('change', function () {
+            if (this.value === 'Autre filière technique') {
+                filiereAutreGroup.style.display = 'block';
+                filiereAutreInput.required = true;
+            } else {
+                filiereAutreGroup.style.display = 'none';
+                filiereAutreInput.required = false;
+                filiereAutreInput.value = '';
+            }
+        });
+
         document.getElementById('inscriptionForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Empêche l'envoi classique pour tout contrôler
 
@@ -116,10 +141,25 @@
                 return;
             }
 
+            // 2. Vérification que la filière personnalisée est bien remplie si "Autre" est choisi
+            if (filiereSelect.value === 'Autre filière technique' && filiereAutreInput.value.trim() === '') {
+                alert("Erreur : Merci de préciser le nom de votre filière.");
+                filiereAutreInput.focus();
+                return;
+            }
+
             const form = event.target;
             const formData = new FormData(form);
 
-            // 2. Envoi des données en arrière-plan vers ton endpoint Formspree
+            // 3. Détermine la filière finale à utiliser (celle tapée si "Autre" est choisi)
+            const filiereFinale = (filiereSelect.value === 'Autre filière technique' && filiereAutreInput.value.trim() !== '')
+                ? filiereAutreInput.value.trim()
+                : filiereSelect.value;
+
+            // On remplace la valeur envoyée à Formspree pour que "filiere" contienne directement la bonne info
+            formData.set('filiere', filiereFinale);
+
+            // 4. Envoi des données en arrière-plan vers ton endpoint Formspree
             try {
                 let response = await fetch(form.action, {
                     method: 'POST',
@@ -131,14 +171,14 @@
                     // Récupération des valeurs pour construire le message WhatsApp
                     const nom = document.getElementById('nom').value;
                     const telephone = document.getElementById('telephone').value;
+                    const quartier = document.getElementById('quartier').value;
                     const statut = document.getElementById('statut').value;
                     const classe = document.getElementById('classe').value;
-                    const filiere = document.getElementById('filiere').value;
                     const etablissement = document.getElementById('etablissement').value || "Non renseigné";
 
-                    // 3. Construction du message WhatsApp
+                    // 5. Construction du message WhatsApp
                     const adminPhone = "2290147928887";
-                    const message = `Salut, je souhaite m'inscrire au Club du Savoir Plus.%0A%0A*Nom :* ${nom}%0A*Téléphone :* ${telephone}%0A*Statut :* ${statut}%0A*Classe :* ${classe}%0A*Filière :* ${filiere}%0A*Établissement :* ${etablissement}`;
+                    const message = `Salut,Voici mes informations :<br>%0A%0A*Nom :* ${nom}%0A*Téléphone :* ${telephone}%0A*Quartier :* ${quartier}%0A*Statut :* ${statut}%0A*Classe :* ${classe}%0A*Filière :* ${filiereFinale}%0A*Établissement :* ${etablissement} <br>Je souhaite m'inscrire au Club du Savoir Plus`;
                     
                     const whatsappURL = `https://wa.me/${adminPhone}?text=${message}`;
 
