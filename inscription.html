@@ -164,10 +164,22 @@
             }
             sheetPayload.set('secret', SHEET_SECRET_KEY);
 
-            try {
+/*            try {
                 fetch(SHEET_WEBAPP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
+                    body: sheetPayload
+                });
+            } catch (err) {
+                console.warn("Envoi vers Google Sheet non confirmé :", err);
+            }
+*/  
+        // Envoi vers le Google Sheet 
+            try {
+                await fetch(SHEET_WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    keepalive: true,
                     body: sheetPayload
                 });
             } catch (err) {
