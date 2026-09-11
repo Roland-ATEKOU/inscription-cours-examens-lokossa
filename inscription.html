@@ -113,11 +113,13 @@
 
     <!-- Script de validation, enregistrement Formspree et redirection WhatsApp -->
     <script>
+        const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyVBkTaeKZFh5QCEeuruezaLDQfj8HjLStlLeVxsjf7rODUbC9Hq5ENHKVwlK0a6iAp/exec";
+        const SHEET_SECRET_KEY = "inscription-tds-cours-lokossa"; 
+
         const filiereSelect = document.getElementById('filiere');
         const filiereAutreGroup = document.getElementById('filiereAutreGroup');
         const filiereAutreInput = document.getElementById('filiere_autre');
 
-        // Affiche/masque le champ "Précisez votre filière" selon le choix du select
         filiereSelect.addEventListener('change', function () {
             if (this.value === 'Autre filière technique') {
                 filiereAutreGroup.style.display = 'block';
@@ -130,18 +132,16 @@
         });
 
         document.getElementById('inscriptionForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Empêche l'envoi classique pour tout contrôler
+            event.preventDefault();
 
             const telInput = document.getElementById('telephone').value.trim();
             const phoneRegex = /^\+?[0-9\s]{8,15}$/;
 
-            // 1. Vérification stricte du téléphone
             if (!phoneRegex.test(telInput)) {
                 alert("Erreur : Le numéro de téléphone WhatsApp ne doit contenir que des chiffres (et éventuellement le signe '+').");
                 return;
             }
 
-            // 2. Vérification que la filière personnalisée est bien remplie si "Autre" est choisi
             if (filiereSelect.value === 'Autre filière technique' && filiereAutreInput.value.trim() === '') {
                 alert("Erreur : Merci de préciser le nom de votre filière.");
                 filiereAutreInput.focus();
@@ -151,15 +151,30 @@
             const form = event.target;
             const formData = new FormData(form);
 
-            // 3. Détermine la filière finale à utiliser (celle tapée si "Autre" est choisi)
             const filiereFinale = (filiereSelect.value === 'Autre filière technique' && filiereAutreInput.value.trim() !== '')
                 ? filiereAutreInput.value.trim()
                 : filiereSelect.value;
 
-            // On remplace la valeur envoyée à Formspree pour que "filiere" contienne directement la bonne info
             formData.set('filiere', filiereFinale);
 
-            // 4. Envoi des données en arrière-plan vers ton endpoint Formspree
+            // Copie des données + clé secrète, envoyée uniquement vers le Google Sheet
+            const sheetPayload = new FormData();
+            for (const [key, value] of formData.entries()) {
+                sheetPayload.append(key, value);
+            }
+            sheetPayload.set('secret', SHEET_SECRET_KEY);
+
+            try {
+                fetch(SHEET_WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: sheetPayload
+                });
+            } catch (err) {
+                console.warn("Envoi vers Google Sheet non confirmé :", err);
+            }
+
+            // Envoi vers Formspree (inchangé, sans la clé secrète)
             try {
                 let response = await fetch(form.action, {
                     method: 'POST',
@@ -168,7 +183,6 @@
                 });
 
                 if (response.ok) {
-                    // Récupération des valeurs pour construire le message WhatsApp
                     const nom = document.getElementById('nom').value;
                     const telephone = document.getElementById('telephone').value;
                     const quartier = document.getElementById('quartier').value;
@@ -176,14 +190,13 @@
                     const classe = document.getElementById('classe').value;
                     const etablissement = document.getElementById('etablissement').value || "Non renseigné";
 
-                    // 5. Construction du message WhatsApp
                     const adminPhone = "2290147928887";
-                    const message = `Salut,Voici mes informations :<br>%0A%0A*Nom :* ${nom}%0A*Téléphone :* ${telephone}%0A*Quartier :* ${quartier}%0A*Statut :* ${statut}%0A*Classe :* ${classe}%0A*Filière :* ${filiereFinale}%0A*Établissement :* ${etablissement} <br>Je souhaite m'inscrire au Club du Savoir Plus`;
-                    
+                    const message = `Salut, je souhaite m'inscrire au Club du Savoir Plus.%0A%0A*Nom :* ${nom}%0A*Téléphone :* ${telephone}%0A*Quartier :* ${quartier}%0A*Statut :* ${statut}%0A*Classe :* ${classe}%0A*Filière :* ${filiereFinale}%0A*Établissement :* ${etablissement}`;
+
                     const whatsappURL = `https://wa.me/${adminPhone}?text=${message}`;
 
                     alert("Préinscription enregistrée avec succès ! Redirection vers WhatsApp...");
-                    window.location.href = whatsappURL; // Redirige vers ton WhatsApp
+                    window.location.href = whatsappURL;
                 } else {
                     alert("Une erreur est survenue lors de l'enregistrement. Veuillez réessayer.");
                 }
@@ -192,6 +205,5 @@
             }
         });
     </script>
-
 </body>
 </html>
